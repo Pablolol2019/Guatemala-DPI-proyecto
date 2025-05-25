@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Identificador de Departamento y Municipio por DPI</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label, input, button { font-size: 1.2em; }
+    #resultado { margin-top: 20px; }
+    h2 { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>Identificador de Departamento y Municipio por DPI</h1>
+  <label for="dpiInput">Ingrese número de DPI (13 dígitos):</label><br />
+  <input type="text" id="dpiInput" maxlength="13" placeholder="Ej: 1234567890123" />
+  <button onclick="identificar()">Identificar</button>
+
+  <div id="resultado"></div>
+
+  <script>
+    const departamentos = {
+      1: {
+        nombre: "Guatemala",
+        poblacion: "≈3.7 millones",
+        extension: "≈2,126 km²",
+        idiomas: ["Español"],
+        rios: ["Motagua"],
+        lagos: [],
+        turismo: ["Ciudad de Guatemala", "Museo Popol Vuh", "Parque Central"],
+        municipios: [
+          "Guatemala", "Santa Catarina Pinula", "San José Pinula",
+          "San José del Golfo", "Palencia", "Chinautla", "San Pedro Ayampuc",
+          "Mixco", "Villa Nueva", "Villa Canales", "Amatitlán"
+        ]
+      },
+      2: {
+        nombre: "El Progreso",
+        poblacion: "≈200 mil",
+        extension: "≈1,936 km²",
+        idiomas: ["Español"],
+        rios: ["Río Motagua"],
+        lagos: [],
+        turismo: ["Puerto Barrios", "Guastatoya"],
+        municipios: [
+          "Guastatoya", "Morazán", "San Agustín Acasaguastlán",
+          "San Cristóbal Acasaguastlán", "El Jícaro", "Sansare",
+          "Sanarate", "Las Cruces"
+        ]
+      },
+      3: {
+        nombre: "Sacatepéquez",
+        poblacion: "≈350 mil",
+        extension: "≈465 km²",
+        idiomas: ["Español"],
+        rios: [],
+        lagos: [],
+        turismo: ["Antigua Guatemala", "Alotenango", "Ciudad Vieja"],
+        municipios: [
+          "Antigua Guatemala", "Ciudad Vieja", "Jocotenango",
+          "Pastores", "Santiago Sacatepéquez", "San Bartolomé Milpas Altas",
+          "San Lucas Sacatepéquez", "Santa Lucía Milpas Altas",
+          "Magdalena Milpas Altas", "San Antonio Aguas Calientes",
+          "Santa María de Jesús", "San Miguel Dueñas"
+        ]
+      },
+      4: {
+        nombre: "Chimaltenango",
+        poblacion: "≈615 mil",
+        extension: "≈1,979 km²",
+        idiomas: ["Español", "Kaqchikel"],
+        rios: ["Río Chimaltenango"],
+        lagos: [],
+        turismo: ["San Juan Comalapa", "Patzún", "Santa Apolonia"],
+        municipios: [
+          "Chimaltenango", "San José Poaquil", "San Martín Jilotepeque",
+          "San Juan Comalapa", "Santa Apolonia", "Patzún",
+          "Acatenango", "Yepocapa", "San Andrés Itzapa",
+          "Parramos", "Zaragoza", "El Tejar"
+        ]
+      },
+      5: {
+        nombre: "Escuintla",
+        poblacion: "≈700 mil",
+        extension: "≈4,384 km²",
+        idiomas: ["Español"],
+        rios: ["Río Madre Vieja"],
+        lagos: [],
+        turismo: ["Puerto San José", "Monterrico", "Iztapa"],
+        municipios: [
+          "Escuintla", "Santa Lucía Cotzumalguapa", "La Democracia",
+          "Siquinalá", "Masagua", "Tiquisate", "La Gomera",
+          "Guanagazapa", "Iztapa", "Palín", "San Vicente Pacaya"
+        ]
+      },
+      6: {
+        nombre: "Santa Rosa",
+        poblacion: "≈400 mil",
+        extension: "≈2,175 km²",
+        idiomas: ["Español"],
+        rios: ["Río Madre Vieja"],
+        lagos: [],
+        turismo: ["Taxisco", "Cuilapa", "Barberena"],
+        municipios: [
+          "Cuilapa", "Barberena", "Santa Rosa de Lima",
+          "Casillas", "San Rafael Las Flores", "Oratorio",
+          "San Juan Tecuaco", "Chiquimulilla", "Taxisco"
+        ]
+      },
+      7: {
+        nombre: "Sololá",
+        poblacion: "≈350 mil",
+        extension: "≈1,061 km²",
+        idiomas: ["Español", "Kaqchikel", "Tz'utujil"],
+        rios: ["Río Panajachel"],
+        lagos: ["Lago de Atitlán"],
+        turismo: ["Panajachel", "Atitlán", "San Pedro La Laguna"],
+        municipios: [
+          "Sololá", "Panajachel", "San Lucas Tolimán",
+          "Santa Catarina Ixtahuacán", "San Pablo La Laguna",
+          "San Marcos La Laguna", "Santiago Atitlán",
+          "San Antonio Palopó", "San José Chacayá", "Santa Cruz La Laguna",
+          "Santa Catarina Palopó"
+        ]
+      },
+      8: {
+        nombre: "Totonicapán",
+        poblacion: "≈350 mil",
+        extension: "≈1,125 km²",
+        idiomas: ["Español", "K'iche'"],
+        rios: [],
+        lagos: [],
+        turismo: ["Totonicapán", "San Cristóbal Totonicapán"],
+        municipios: [
+          "Totonicapán", "San Andrés Xecul", "Momostenango",
+          "Santa María Chiquimula", "San Bartolo Aguas Calientes"
+        ]
+      },
+      9: {
+        nombre: "Quetzaltenango",
+        poblacion: "≈800 mil",
+        extension: "≈1,951 km²",
+        idiomas: ["Español", "K'iche'"],
+        rios: ["Río Xequijel"],
+        lagos: [],
+        turismo: ["Ciudad de Quetzaltenango", "Zunil", "Almolonga"],
+        municipios: [
+          "Quetzaltenango", "Salcajá", "San Carlos Sija",
+          "La Esperanza", "Cantel", "Concepción Chiquirichapa",
+          "Olintepeque", "San Mateo", "Almolonga",
+          "San Francisco La Unión", "San Sebastián",
+          "Colomba Costa Cuca", "San Miguel Sigüilá",
+          "Huitán", "Zunil"
+        ]
+      },
+      10: {
+        nombre: "Suchitepéquez",
+        poblacion: "≈500 mil",
+        extension: "≈2,510 km²",
+        idiomas: ["Español", "K'iche'"],
+        rios: ["Río Samalá"],
+        lagos: [],
+        turismo: ["Mazatenango", "San Francisco Zapotitlán", "Cuyotenango"],
+        municipios: [
+          "Mazatenango", "San Francisco Zapotitlán", "Cuyotenango",
+          "San Bernardino", "San José El Idolo", "Santo Tomás La Unión",
+          "San Lorenzo", "Samayac", "San Pablo Jocopilas",
+          "San Antonio Suchitepéquez", "Patulul", "San Miguel Panán",
+          "Santa Bárbara", "San Juan Bautista", "Santo Domingo Suchitepéquez",
+          "San Gabriel", "Chicacao"
+        ]
+      },
+      11: {
+        nombre: "Chiquimula",
+        poblacion: "≈200 mil",
+        extension: "≈2,384 km²",
+        idiomas: ["Español"],
+        rios: ["Río Chiquimula"],
+        lagos: [],
+        turismo: ["Chiquimula", "Ipala"],
+        municipios: [
+          "Chiquimula", "San José La Arada", "San Juan Ermita",
+          "Jocotán", "Camotán", "Olopa", "Concepción Las Minas",
+          "Esquipulas", "Quezaltepeque"
+        ]
+      },
+      12: {
+        nombre: "Jalapa",
+        poblacion: "≈200 mil",
+        extension: "≈1,975 km²",
+        idiomas: ["Español"],
+        rios: ["Río Jalapa"],
+        lagos: [],
+        turismo: ["Jalapa", "San Manuel Chaparrón"],
+        municipios: [
+          "Jalapa", "Mataquescuintla", "San Carlos Alzatate",
+          "San Luis Jilotepeque", "San Manuel Chaparrón",
+          "Monjas", "San Pedro Pinula"
+        ]
+      },
+      13: {
+        nombre: "Jutiapa",
+        poblacion: "≈400 mil",
+        extension: "≈3,219 km²",
+        idiomas: ["Español"],
+        rios: ["Río Jutiapa"],
+        lagos: [],
+        turismo: ["Jutiapa", "Agua Blanca"],
+        municipios: [
+          "Jutiapa", "El Progreso", "Jerez",
+          "Santa Catarina Mita", "Yupiltepeque", "Asunción Mita",
+          "Concepción Las Minas", "Comapa", "Quesada",
+          "Jalpatagua", "Agua Blanca"
+        ]
+      },
+      14: {
+        nombre: "Petén",
+        poblacion: "≈600 mil",
+        extension: "≈36,522 km²",
+        idiomas: ["Español", "Itzá", "Q’eqchi’"],
+        rios: ["Usumacinta", "La Pasión", "San Pedro"],
+        lagos: ["Petén Itzá", "Salpetén", "Yaxhá"],
+        turismo: ["Tikal", "Yaxhá", "Flores"],
+        municipios: [
+          "Flores", "San Benito", "San Andrés", "La Libertad",
+          "Melchor de Mencos", "Poptún", "Sayaxché", "San José",
+          "Dolores", "Las Cruces", "Paxilá", "Uaxactún"
+        ]
+      },
+      15: {
+        nombre: "Izabal",
+        poblacion: "≈400 mil",
+        extension: "≈9,038 km²",
+        idiomas: ["Español", "Q'eqchi'"],
+        rios: ["Río Dulce"],
+        lagos: ["Lago de Izabal"],
+        turismo: ["Livingston", "Puerto Barrios", "Castillo de San Felipe"],
+        municipios: [
+          "Puerto Barrios", "Livingston", "El Estor",
+          "Morales", "Los Amates"
+        ]
+      },
+      16: {
+        nombre: "Zacapa",
+        poblacion: "≈250 mil",
+        extension: "≈3,691 km²",
+        idiomas: ["Español"],
+        rios: ["Río Grande"],
+        lagos: [],
+        turismo: ["Zacapa", "Teculután"],
+        municipios: [
+          "Zacapa", "Estanzuela", "Rio Hondo",
+          "Gualán", "Usumatlán", "Cabañas",
+          "San Diego", "La Unión"
+        ]
+      },
+      17: {
+        nombre: "Jalapa",
+        poblacion: "≈200 mil",
+        extension: "≈1,975 km²",
+        idiomas: ["Español"],
+        rios: ["Río Jalapa"],
+        lagos: [],
+        turismo: ["Jalapa", "San Manuel Chaparrón"],
+        municipios: [
+          "Jalapa", "Mataquescuintla", "San Carlos Alzatate",
+          "San Luis Jilotepeque", "San Manuel Chaparrón",
+          "Monjas", "San Pedro Pinula"
+        ]
+      },
+      18: {
+        nombre: "Chiquimula",
+        poblacion: "≈200 mil",
+        extension: "≈2,384 km²",
+        idiomas: ["Español"],
+        rios: ["Río Chiquimula"],
+        lagos: [],
+        turismo: ["Chiquimula", "Ipala"],
+        municipios: [
+          "Chiquimula", "San José La Arada", "San Juan Ermita",
+          "Jocotán", "Camotán", "Olopa", "Concepción Las Minas",
+          "Esquipulas", "Quezaltepeque"
+        ]
+      },
+      19: {
+        nombre: "Santa Rosa",
+        poblacion: "≈400 mil",
+        extension: "≈2,175 km²",
+        idiomas: ["Español"],
+        rios: ["Río Madre Vieja"],
+        lagos: [],
+        turismo: ["Taxisco", "Cuilapa", "Barberena"],
+        municipios: [
+          "Cuilapa", "Barberena", "Santa Rosa de Lima",
+          "Casillas", "San Rafael Las Flores", "Oratorio",
+          "San Juan Tecuaco", "Chiquimulilla", "Taxisco"
+        ]
+      },
+      20: {
+        nombre: "Jutiapa",
+        poblacion: "≈400 mil",
+        extension: "≈3,219 km²",
+        idiomas: ["Español"],
+        rios: ["Río Jutiapa"],
+        lagos: [],
+        turismo: ["Jutiapa", "Agua Blanca"],
+        municipios: [
+          "Jutiapa", "El Progreso", "Jerez",
+          "Santa Catarina Mita", "Yupiltepeque", "Asunción Mita",
+          "Concepción Las Minas", "Comapa", "Quesada",
+          "Jalpatagua", "Agua Blanca"
+        ]
+      },
+      21: {
+        nombre: "Petén",
+        poblacion: "≈600 mil",
+        extension: "≈36,522 km²",
+        idiomas: ["Español", "Itzá", "Q’eqchi’"],
+        rios: ["Usumacinta", "La Pasión", "San Pedro"],
+        lagos: ["Petén Itzá", "Salpetén", "Yaxhá"],
+        turismo: ["Tikal", "Yaxhá", "Flores"],
+        municipios: [
+          "Flores", "San Benito", "San Andrés", "La Libertad",
+          "Melchor de Mencos", "Poptún", "Sayaxché", "San José",
+          "Dolores", "Las Cruces", "Paxilá", "Uaxactún"
+        ]
+      },
+      22: {
+        nombre: "Izabal",
+        poblacion: "≈400 mil",
+        extension: "≈9,038 km²",
+        idiomas: ["Español", "Q'eqchi'"],
+        rios: ["Río Dulce"],
+        lagos: ["Lago de Izabal"],
+        turismo: ["Livingston", "Puerto Barrios", "Castillo de San Felipe"],
+        municipios: [
+          "Puerto Barrios", "Livingston", "El Estor",
+          "Morales", "Los Amates"
+        ]
+      }
+    };
+
+    function identificar() {
+      const dpi = document.getElementById("dpiInput").value.trim();
+      const resultado = document.getElementById("resultado");
+
+      // Validar que DPI tenga 13 dígitos numéricos
+      if (!/^\d{13}$/.test(dpi)) {
+        resultado.innerHTML = "<p style='color:red;'>Por favor, ingresa un DPI válido de 13 dígitos.</p>";
+        return;
+      }
+
+      // Extraer código departamento (dígitos 10 y 11, índices 9 y 10)
+      const departamentoCodigo = parseInt(dpi.substring(9, 11), 10);
+      // Extraer código municipio (dígitos 12 y 13, índices 11 y 12)
+      const municipioCodigo = parseInt(dpi.substring(11, 13), 10);
+
+      const departamento = departamentos[departamentoCodigo];
+
+      if (!departamento) {
+        resultado.innerHTML = "<p style='color:red;'>Departamento no encontrado con ese código.</p>";
+        return;
+      }
+
+      if (municipioCodigo < 1 || municipioCodigo > departamento.municipios.length) {
+        resultado.innerHTML = "<p style='color:red;'>Municipio no encontrado con ese código.</p>";
+        return;
+      }
+
+      const municipioNombre = departamento.municipios[municipioCodigo - 1];
+
+      resultado.innerHTML = `
+        <h2>Departamento: ${departamento.nombre}</h2>
+        <p><strong>Población:</strong> ${departamento.poblacion}</p>
+        <p><strong>Extensión:</strong> ${departamento.extension}</p>
+        <p><strong>Idiomas:</strong> ${departamento.idiomas.join(", ")}</p>
+        <p><strong>Ríos:</strong> ${departamento.rios.length ? departamento.rios.join(", ") : "Ninguno"}</p>
+        <p><strong>Lagos:</strong> ${departamento.lagos.length ? departamento.lagos.join(", ") : "Ninguno"}</p>
+        <p><strong>Lugares turísticos:</strong> ${departamento.turismo.join(", ")}</p>
+        <h3>Municipio:</h3>
+        <p>${municipioNombre}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
